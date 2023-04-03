@@ -1,25 +1,52 @@
 package com.example.animeyourself
 
-import android.content.Intent
+import android.app.Application
 import android.net.Uri
-import android.provider.MediaStore
+import android.os.Environment
 import androidx.annotation.MainThread
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.*
-import java.net.URI
+import androidx.lifecycle.Observer
+import java.io.File
+import java.text.SimpleDateFormat
+import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
 
-class InputViewModel : ViewModel() {
 
-    private val _videoURI = MutableLiveData<URI>()
-    val videoURI: LiveData<URI>
-        get() = _videoURI
-    private val _onVideoSelected = SingleLiveEvent<Uri>()
-    val onVideoSelected: LiveData<Uri>
-        get() = _onVideoSelected
+class InputViewModel(application: Application) : AndroidViewModel(application) {
 
-    fun selectVideoFromGallery() {
-        val intent = Intent(Intent.ACTION_PICK, MediaStore.Video.Media.EXTERNAL_CONTENT_URI)
-        // startActivityForResult
+    // private val _videoURI = MutableLiveData<URI>()
+    // val videoURI: LiveData<URI>
+    //     get() = _videoURI
+    // private val _onVideoSelected = SingleLiveEvent<Uri>()
+    // val onVideoSelected: LiveData<Uri>
+    //     get() = _onVideoSelected
+
+    private var videoUri: Uri? = null
+
+    private val _videoInputEvent = SingleLiveEvent<Uri>()
+    val videoInputEvent: LiveData<Uri>
+        get() = _videoInputEvent
+
+
+    fun onVideoInputSelected(videoUri: Uri) {
+        _videoInputEvent.value = videoUri
+    }
+
+
+    private fun createVideoFile(fragment: Fragment): File {
+        val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+        val storageDir = fragment.requireContext().getExternalFilesDir(Environment.DIRECTORY_MOVIES)
+        return File.createTempFile(
+            "VIDEO_${timeStamp}_",
+            ".mp4",
+            storageDir
+        )
+    }
+
+    companion object {
+        const val REQUEST_CODE_CAMERA = 100
+        const val REQUEST_CODE_GALLERY = 101
     }
 
     open class SingleLiveEvent<T> : MutableLiveData<T>() {
