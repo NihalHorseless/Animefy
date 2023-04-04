@@ -1,26 +1,18 @@
 package com.example.animeyourself
 
-import android.app.AlertDialog
-import android.content.pm.ActivityInfo
-import android.content.pm.PackageManager
+import android.app.Activity
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.Toast
 import android.widget.VideoView
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import com.bumptech.glide.RequestManager
 import com.example.animeyourself.databinding.FragmentInputBinding
-import com.zhihu.matisse.Matisse
-import com.zhihu.matisse.MimeType
-import com.zhihu.matisse.engine.impl.GlideEngine
-import com.zhihu.matisse.internal.entity.CaptureStrategy
 
 
 class InputFragment : Fragment() {
@@ -29,18 +21,11 @@ class InputFragment : Fragment() {
     private lateinit var binding: FragmentInputBinding
 
     //Fields
+    private lateinit var recordBtn: Button
     private lateinit var chooseBtn: Button
     private lateinit var filterBtn: Button
     private lateinit var previewVid: VideoView
 
-    private val permissionRequestLauncher =
-        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
-            if (isGranted) {
-                chooseVideo()
-            } else {
-                Toast.makeText(requireContext(), "Permission Denied", Toast.LENGTH_SHORT).show()
-            }
-        }
 
     private lateinit var viewModel: InputViewModel
 
@@ -59,61 +44,83 @@ class InputFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initializeFields()
+        observeViewModel()
 
+    }
+
+    private fun observeViewModel() {
+        viewModel.selectedVideoUri.observe(viewLifecycleOwner) { uri ->
+            videoInputUri = uri
+            if (videoInputUri != null) {
+                prepareVideoInput(videoInputUri!!)
+            }
+        }
     }
 
     private fun initializeFields() {
         viewModel = ViewModelProvider(this)[InputViewModel::class.java]
 
-        chooseBtn = binding.videoBtn
+        chooseBtn = binding.chooseVideoBtn
+        recordBtn = binding.recordVideoBtn
+        filterBtn = binding.animateBtn
+        previewVid = binding.videoView
 
         chooseBtn.setOnClickListener {
-            if (ContextCompat.checkSelfPermission(
-                    requireContext(),
-                    android.Manifest.permission.READ_EXTERNAL_STORAGE
-                ) == PackageManager.PERMISSION_GRANTED
-            ) {
-                chooseVideo()
-            } else {
-                permissionRequestLauncher.launch(android.Manifest.permission.READ_EXTERNAL_STORAGE)
-            }
+            launchVideoChooser()
         }
-        viewModel.videoInputEvent.observe(viewLifecycleOwner) { videoUri ->
-            videoUri?.let {
-                prepareVideoInput(it)
-            }
+
+        recordBtn.setOnClickListener {
+            launchVideoRecorder()
+        }
+
+        filterBtn.setOnClickListener {
+            //  navigateToFilterScreen()
         }
 
     }
+
+    private fun launchVideoChooser() {
+        val intent = Intent(Intent.ACTION_PICK, MediaStore.Video.Media.EXTERNAL_CONTENT_URI)
+        startActivityForResult(intent, REQUEST_VIDEO_CHOOSER)
+    }
+
+    private fun launchVideoRecorder() {
+        val intent = Intent(MediaStore.ACTION_VIDEO_CAPTURE)
+        startActivityForResult(intent, REQUEST_VIDEO_RECORDER)
+    }
+
 
     private fun prepareVideoInput(videoUri: Uri) {
         previewVid.setVideoURI(videoUri)
         previewVid.start()
     }
 
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == Activity.RESULT_OK) {
+            when (requestCode) {
+                REQUEST_VIDEO_CHOOSER -> {
+                    data?.data?.let { uri ->
+                        videoInputUri = uri
+                        viewModel.selectVideoUri(uri)
+                    }
+                }
+                REQUEST_VIDEO_RECORDER -> {
+                    data?.data?.let { uri ->
+                        videoInputUri = uri
+                        viewModel.selectVideoUri(uri)
+                    }
+                }
+            }
+            previewVid.visibility = View.VISIBLE
+        }
+    }
+
     companion object {
-        const val REQUEST_CODE_CHOOSE = 23
+        private const val REQUEST_VIDEO_CHOOSER = 1
+        private const val REQUEST_VIDEO_RECORDER = 2
     }
-
-    private fun chooseVideo() {
-        Matisse.from(this)
-            .choose(MimeType.of(MimeType.MP4))
-            .countable(true)
-            .maxSelectable(1)
-            .capture(true)
-            .captureStrategy(
-                CaptureStrategy(
-                    true,
-                    "${requireActivity().packageName}.provider",
-                    "video"
-                )
-            )
-            .restrictOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED)
-            .thumbnailScale(0.85f)
-            .imageEngine(GlideEngine())
-            .forResult(REQUEST_CODE_CHOOSE)
-    }
-
 
 
 }
