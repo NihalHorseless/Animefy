@@ -114,23 +114,6 @@ class InputFragment : Fragment() {
             .forResult(REQUEST_CODE_CHOOSE)
     }
 
-    private fun showInputDialog() {
-        val options = arrayOf<String>("Record a Video", "Choose from Gallery")
-        val builder = AlertDialog.Builder(requireContext())
-        builder.setTitle("Selected Video")
-        builder.setItems(options) { dialog, which ->
-            when (which) {
-                0 -> {
-                    // User selects Record option
 
-                }
-                1 -> {
-                    // User selects Gallery option
-
-                }
-            }
-        }
-        builder.show()
-    }
 
 }

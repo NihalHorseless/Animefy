@@ -15,12 +15,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 class InputViewModel(application: Application) : AndroidViewModel(application) {
 
-    // private val _videoURI = MutableLiveData<URI>()
-    // val videoURI: LiveData<URI>
-    //     get() = _videoURI
-    // private val _onVideoSelected = SingleLiveEvent<Uri>()
-    // val onVideoSelected: LiveData<Uri>
-    //     get() = _onVideoSelected
+
 
     private var videoUri: Uri? = null
 
@@ -34,15 +29,7 @@ class InputViewModel(application: Application) : AndroidViewModel(application) {
     }
 
 
-    private fun createVideoFile(fragment: Fragment): File {
-        val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
-        val storageDir = fragment.requireContext().getExternalFilesDir(Environment.DIRECTORY_MOVIES)
-        return File.createTempFile(
-            "VIDEO_${timeStamp}_",
-            ".mp4",
-            storageDir
-        )
-    }
+
 
     companion object {
         const val REQUEST_CODE_CAMERA = 100
