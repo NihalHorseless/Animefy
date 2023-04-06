@@ -8,10 +8,13 @@ pluginManagement {
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
-        jcenter()
-        google()
         mavenCentral()
+        google()
+
     }
 }
 rootProject.name = "AnimeYourself"
 include ':app'
+//def opencvsdk='C:\\Users\\onaslan\\Downloads\\OpenCV-android-sdk'
+// project(':opencv').projectDir = new File(opencvsdk + '/sdk')
+include ':opencv'

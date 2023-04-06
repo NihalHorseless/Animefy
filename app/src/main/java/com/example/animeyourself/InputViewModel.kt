@@ -1,15 +1,13 @@
 package com.example.animeyourself
 
-import android.app.Application
 import android.net.Uri
-import android.view.View
 import android.widget.VideoView
-import androidx.annotation.MainThread
-import androidx.lifecycle.*
-import java.util.concurrent.atomic.AtomicBoolean
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 
 
-class InputViewModel(application: Application) : AndroidViewModel(application) {
+class InputViewModel: ViewModel(){
 
 
     private var videoUri: Uri? = null

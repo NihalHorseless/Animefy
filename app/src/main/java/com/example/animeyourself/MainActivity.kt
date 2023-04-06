@@ -6,6 +6,8 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.example.animeyourself.databinding.ActivityMainBinding
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import org.opencv.engine.OpenCVEngineInterface
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -20,6 +22,7 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        System.loadLibrary("opencv_java4")
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.fragment) as NavHostFragment
         navController = navHostFragment.navController
