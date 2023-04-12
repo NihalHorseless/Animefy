@@ -9,9 +9,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.Toast
 import android.widget.VideoView
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.os.bundleOf
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.findNavController
 import com.example.animeyourself.databinding.FragmentInputBinding
 
 
@@ -31,6 +37,26 @@ class InputFragment : Fragment() {
 
     private var videoInputUri: Uri? = null
 
+    private val videoChooser =
+        registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+            uri?.let {
+                videoInputUri = it
+                prepareVideoInput(it)
+                previewVid.visibility = View.VISIBLE
+            }
+        }
+
+    private val videoRecorder =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                result.data?.data?.let { uri ->
+                    videoInputUri = uri
+                    viewModel.selectVideoUri(uri)
+                }
+                previewVid.visibility = View.VISIBLE
+            }
+        }
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -44,17 +70,7 @@ class InputFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initializeFields()
-        observeViewModel()
 
-    }
-
-    private fun observeViewModel() {
-        viewModel.selectedVideoUri.observe(viewLifecycleOwner) { uri ->
-            videoInputUri = uri
-            if (videoInputUri != null) {
-                prepareVideoInput(videoInputUri!!)
-            }
-        }
     }
 
     private fun initializeFields() {
@@ -74,19 +90,31 @@ class InputFragment : Fragment() {
         }
 
         filterBtn.setOnClickListener {
-            //  navigateToFilterScreen()
+            if (previewVid.isVisible) {
+                val videoUri = videoInputUri.toString()
+                val bundle = bundleOf("videoUri" to videoUri)
+                binding.root.findNavController().navigate(R.id.action_inputFragment_to_filterFragment,bundle)
+            }
+            else
+                Toast.makeText(requireActivity(),"Enter a Video!",Toast.LENGTH_SHORT).show()
+        }
+
+        viewModel.selectedVideoUri.observe(viewLifecycleOwner) { uri ->
+            videoInputUri = uri
+            if (videoInputUri != null) {
+                prepareVideoInput(videoInputUri!!)
+            }
         }
 
     }
 
     private fun launchVideoChooser() {
-        val intent = Intent(Intent.ACTION_PICK, MediaStore.Video.Media.EXTERNAL_CONTENT_URI)
-        startActivityForResult(intent, REQUEST_VIDEO_CHOOSER)
+        videoChooser.launch("video/*")
     }
 
     private fun launchVideoRecorder() {
         val intent = Intent(MediaStore.ACTION_VIDEO_CAPTURE)
-        startActivityForResult(intent, REQUEST_VIDEO_RECORDER)
+        videoRecorder.launch(intent)
     }
 
 
@@ -96,29 +124,9 @@ class InputFragment : Fragment() {
     }
 
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode == Activity.RESULT_OK) {
-            when (requestCode) {
-                REQUEST_VIDEO_CHOOSER -> {
-                    data?.data?.let { uri ->
-                        videoInputUri = uri
-                        viewModel.selectVideoUri(uri)
-                    }
-                }
-                REQUEST_VIDEO_RECORDER -> {
-                    data?.data?.let { uri ->
-                        videoInputUri = uri
-                        viewModel.selectVideoUri(uri)
-                    }
-                }
-            }
-            previewVid.visibility = View.VISIBLE
-        }
-    }
+
 
     companion object {
-        private const val REQUEST_VIDEO_CHOOSER = 1
         private const val REQUEST_VIDEO_RECORDER = 2
     }
 

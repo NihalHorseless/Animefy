@@ -15,6 +15,3 @@ dependencyResolutionManagement {
 }
 rootProject.name = "AnimeYourself"
 include ':app'
-//def opencvsdk='C:\\Users\\onaslan\\Downloads\\OpenCV-android-sdk'
-// project(':opencv').projectDir = new File(opencvsdk + '/sdk')
-include ':opencv'
