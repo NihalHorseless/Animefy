@@ -12,4 +12,5 @@
     <string name="filter_comics">Comic</string>
     <string name="filter_dune">Dune</string>
     <string name="filter_none">No Filter</string>
+    <string name="filter_S">Custom</string>
 </resources>
