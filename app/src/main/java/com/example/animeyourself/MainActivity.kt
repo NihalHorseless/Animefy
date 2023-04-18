@@ -9,7 +9,7 @@ import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.example.animeyourself.databinding.ActivityMainBinding
-import jp.co.cyberagent.android.gpuimage.filter.GPUImageToonFilter
+
 
 
 class MainActivity : AppCompatActivity() {

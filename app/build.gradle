@@ -46,7 +46,7 @@ dependencies {
     implementation "androidx.navigation:navigation-fragment-ktx:2.5.3"
     implementation "androidx.navigation:navigation-ui-ktx:2.5.3"
     //GpuImage
-    implementation 'jp.co.cyberagent.android:gpuimage:2.1.0'
+    // implementation 'jp.co.cyberagent.android:gpuimage:2.1.0'
     implementation 'com.github.MasayukiSuda:GPUVideo-android:v0.1.2'
     //ExoPlayer
     implementation 'com.google.android.exoplayer:exoplayer:2.18.1'
