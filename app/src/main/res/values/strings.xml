@@ -9,8 +9,8 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="fiter_name_txt">Filter Name</string>
     <string name="filter_anime">Anime</string>
-    <string name="filter_comics">Dark</string>
+    <string name="filter_comics">Gray</string>
     <string name="filter_dune">Dune</string>
-    <string name="filter_none">No Filter</string>
-    <string name="filter_S">Custom</string>
+    <string name="filter_poster">Poster</string>
+    <string name="filter_S">Neon</string>
 </resources>

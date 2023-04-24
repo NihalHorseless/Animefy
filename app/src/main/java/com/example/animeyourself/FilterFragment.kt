@@ -17,8 +17,13 @@ import androidx.lifecycle.lifecycleScope
 import com.daasuu.gpuv.composer.FillMode
 import com.daasuu.gpuv.composer.GPUMp4Composer
 import com.daasuu.gpuv.composer.Rotation
-import com.daasuu.gpuv.egl.filter.*
+import com.daasuu.gpuv.egl.filter.GlFilter
+import com.daasuu.gpuv.egl.filter.GlGrayScaleFilter
+import com.daasuu.gpuv.egl.filter.GlPosterizeFilter
 import com.example.animeyourself.databinding.FragmentFilterBinding
+import com.example.animeyourself.customfilters.AnimeCartoonFilter
+import com.example.animeyourself.customfilters.GlNeonFilter
+import com.example.animeyourself.customfilters.GlOrangeFilter
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.launch
@@ -33,7 +38,7 @@ class FilterFragment : Fragment() {
     private val TAG = "FilterFragment"
 
     //Fields
-    private lateinit var filteredVid: VideoView
+    private lateinit var filteredVideoView: VideoView
     private lateinit var saveBtn: FloatingActionButton
     private lateinit var filterOptions: ChipGroup
 
@@ -43,7 +48,7 @@ class FilterFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentFilterBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -56,8 +61,8 @@ class FilterFragment : Fragment() {
     }
 
     private fun initializeFields() {
-
-        filteredVid = binding.videoView
+        val posterFilter = GlPosterizeFilter()
+        filteredVideoView = binding.videoView
         saveBtn = binding.floatingActionButton
         filterOptions = binding.chipGroup
         // Get the URI of the video from the arguments
@@ -65,26 +70,39 @@ class FilterFragment : Fragment() {
         // Creating temp file to reference path
         val tempFile = createTempFileHere(sourceVideoUri)
         val outputFilePath = "${requireContext().cacheDir}/filtered_video.mp4"
+        posterFilter.setColorLevels(8)
         filterOptions.setOnCheckedStateChangeListener { _, checkedId ->
             when (checkedId[0]) {
                 R.id.chipAnime -> {
                     applyFilter(
-                        GlPosterizeFilter(),
-                        GlSharpenFilter(),
+                        AnimeCartoonFilter(),
                         tempFile.path,
                         outputFilePath
                     )
                 }
                 R.id.chipGrayscale -> {
                     applyFilter(
-                        GlMonochromeFilter(),
-                        GlPosterizeFilter(),
+                        GlGrayScaleFilter(),
                         tempFile.path,
                         outputFilePath
                     )
                 }
                 R.id.chipSepia -> {
-                    applyFilter(GlSepiaFilter(), GlPosterizeFilter(), tempFile.path, outputFilePath)
+                    applyFilter(
+                        GlOrangeFilter(),
+                        tempFile.path, outputFilePath
+                    )
+                }
+                R.id.chipPoster -> {
+                    applyFilter(
+                        posterFilter,
+                        tempFile.path, outputFilePath
+                    )
+                }
+                R.id.chipNeon -> {
+                    applyFilter(
+                        GlNeonFilter(), tempFile.path, outputFilePath
+                    )
                 }
             }
         }
@@ -135,8 +153,7 @@ class FilterFragment : Fragment() {
     }
 
     private fun applyFilter(
-        firstFilter: GlFilter,
-        secondFilter: GlFilter,
+        appliedFilter: GlFilter,
         filePath: String,
         outputFilePath: String
     ) {
@@ -144,7 +161,7 @@ class FilterFragment : Fragment() {
             GPUMp4Composer(filePath, outputFilePath)
                 .rotation(Rotation.NORMAL)
                 .fillMode(FillMode.PRESERVE_ASPECT_CROP)
-                .filter(GlFilterGroup(firstFilter, secondFilter))
+                .filter(appliedFilter)
                 .listener(object : GPUMp4Composer.Listener {
                     override fun onProgress(progress: Double) {
                         Log.d(TAG, "onProgress = $progress")
@@ -153,8 +170,8 @@ class FilterFragment : Fragment() {
                     override fun onCompleted() {
                         Log.d(TAG, "onCompleted()")
                         requireActivity().runOnUiThread {
-                            filteredVid.setVideoPath(outputFilePath)
-                            filteredVid.start()
+                            filteredVideoView.setVideoPath(outputFilePath)
+                            filteredVideoView.start()
                             Toast.makeText(
                                 context,
                                 "codec complete path =$outputFilePath",
