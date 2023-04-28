@@ -4,7 +4,7 @@ import android.opengl.GLES20;
 
 import com.daasuu.gpuv.egl.filter.GlFilter;
 
-public class AnimeCartoonFilter extends GlFilter {
+public class GlAnimeFilter extends GlFilter {
 
     private static final String ANIME_CARTOON_FRAGMENT_SHADER = "" +
             "precision mediump float;\n" +
@@ -25,11 +25,11 @@ public class AnimeCartoonFilter extends GlFilter {
             "    gl_FragColor = vec4(finalColor, 1.0);\n" +
             "}";
 
-    public AnimeCartoonFilter() {
+    public GlAnimeFilter() {
         super(DEFAULT_VERTEX_SHADER, ANIME_CARTOON_FRAGMENT_SHADER);
     }
 
-    private float intensity = 5f;
+    private float intensity = 4f;
 
     public void setIntensity(float intensity) {
         if (intensity < 0.0f) {

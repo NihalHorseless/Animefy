@@ -47,11 +47,11 @@
             android:text="@string/filter_anime" />
 
         <com.google.android.material.chip.Chip
-            android:id="@+id/chipGrayscale"
+            android:id="@+id/chipCandy"
             style="@style/Widget.MaterialComponents.Chip.Choice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/filter_comics" />
+            android:text="@string/filter_candy" />
 
         <com.google.android.material.chip.Chip
             android:id="@+id/chipSepia"

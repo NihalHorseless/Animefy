@@ -32,7 +32,6 @@ class InputFragment : Fragment() {
     private lateinit var filterBtn: Button
     private lateinit var previewVid: VideoView
 
-
     private lateinit var viewModel: InputViewModel
 
     private var videoInputUri: Uri? = null
@@ -122,13 +121,4 @@ class InputFragment : Fragment() {
         previewVid.setVideoURI(videoUri)
         previewVid.start()
     }
-
-
-
-
-    companion object {
-        private const val REQUEST_VIDEO_RECORDER = 2
-    }
-
-
 }

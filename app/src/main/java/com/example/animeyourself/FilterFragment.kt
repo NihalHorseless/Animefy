@@ -12,18 +12,15 @@ import android.widget.Toast
 import android.widget.VideoView
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.daasuu.gpuv.composer.FillMode
 import com.daasuu.gpuv.composer.GPUMp4Composer
 import com.daasuu.gpuv.composer.Rotation
-import com.daasuu.gpuv.egl.filter.GlFilter
-import com.daasuu.gpuv.egl.filter.GlGrayScaleFilter
-import com.daasuu.gpuv.egl.filter.GlPosterizeFilter
-import com.example.animeyourself.databinding.FragmentFilterBinding
-import com.example.animeyourself.customfilters.AnimeCartoonFilter
-import com.example.animeyourself.customfilters.GlNeonFilter
+import com.daasuu.gpuv.egl.filter.*
+import com.example.animeyourself.customfilters.GlAnimeFilter
+import com.example.animeyourself.customfilters.GlCandyRedFilter
 import com.example.animeyourself.customfilters.GlOrangeFilter
+import com.example.animeyourself.databinding.FragmentFilterBinding
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.launch
@@ -34,7 +31,7 @@ import java.io.IOException
 class FilterFragment : Fragment() {
 
     private lateinit var binding: FragmentFilterBinding
-    private val viewModel: FilterViewModel by viewModels()
+
     private val TAG = "FilterFragment"
 
     //Fields
@@ -75,14 +72,16 @@ class FilterFragment : Fragment() {
             when (checkedId[0]) {
                 R.id.chipAnime -> {
                     applyFilter(
-                        AnimeCartoonFilter(),
+                        GlFilterGroup(posterFilter,
+                            GlAnimeFilter()
+                        ),
                         tempFile.path,
                         outputFilePath
                     )
                 }
-                R.id.chipGrayscale -> {
+                R.id.chipCandy -> {
                     applyFilter(
-                        GlGrayScaleFilter(),
+                        GlCandyRedFilter(),
                         tempFile.path,
                         outputFilePath
                     )
@@ -101,12 +100,13 @@ class FilterFragment : Fragment() {
                 }
                 R.id.chipNeon -> {
                     applyFilter(
-                        GlNeonFilter(), tempFile.path, outputFilePath
+                        GlFilterGroup(GlMonochromeFilter(), GlVignetteFilter()),
+                        tempFile.path,
+                        outputFilePath
                     )
                 }
             }
         }
-        // Set the video URI as the data source for the VideoView
 
         saveBtn.setOnClickListener {
             saveVideoToGallery()
@@ -115,6 +115,7 @@ class FilterFragment : Fragment() {
     }
 
     private fun saveVideoToGallery() {
+
         val contentResolver = requireContext().contentResolver
         val values = ContentValues().apply {
             put(MediaStore.Video.Media.DISPLAY_NAME, "filtered_video.mp4")
@@ -122,6 +123,7 @@ class FilterFragment : Fragment() {
             put(MediaStore.Video.Media.DATE_ADDED, System.currentTimeMillis() / 1000)
             put(MediaStore.Video.Media.DATE_MODIFIED, System.currentTimeMillis() / 1000)
         }
+
         val uri = contentResolver.insert(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, values)
         try {
             uri?.let {
@@ -172,6 +174,7 @@ class FilterFragment : Fragment() {
                         requireActivity().runOnUiThread {
                             filteredVideoView.setVideoPath(outputFilePath)
                             filteredVideoView.start()
+
                             Toast.makeText(
                                 context,
                                 "codec complete path =$outputFilePath",
