@@ -8,17 +8,15 @@ import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.Toast
 import android.widget.VideoView
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.os.bundleOf
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import com.example.animeyourself.databinding.FragmentInputBinding
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 
 class InputFragment : Fragment() {
@@ -27,9 +25,8 @@ class InputFragment : Fragment() {
     private lateinit var binding: FragmentInputBinding
 
     //Fields
-    private lateinit var recordBtn: Button
-    private lateinit var chooseBtn: Button
-    private lateinit var filterBtn: Button
+    private lateinit var recordBtn: FloatingActionButton
+    private lateinit var chooseBtn: FloatingActionButton
     private lateinit var previewVid: VideoView
 
     private lateinit var viewModel: InputViewModel
@@ -41,7 +38,7 @@ class InputFragment : Fragment() {
             uri?.let {
                 videoInputUri = it
                 prepareVideoInput(it)
-                previewVid.visibility = View.VISIBLE
+                navigateToNext()
             }
         }
 
@@ -52,7 +49,7 @@ class InputFragment : Fragment() {
                     videoInputUri = uri
                     viewModel.selectVideoUri(uri)
                 }
-                previewVid.visibility = View.VISIBLE
+                navigateToNext()
             }
         }
 
@@ -75,28 +72,26 @@ class InputFragment : Fragment() {
     private fun initializeFields() {
         viewModel = ViewModelProvider(this)[InputViewModel::class.java]
 
-        chooseBtn = binding.chooseVideoBtn
-        recordBtn = binding.recordVideoBtn
-        filterBtn = binding.animateBtn
+        chooseBtn = binding.galleryBtn
+        recordBtn = binding.cameraBtn
+
         previewVid = binding.videoView
+        // To ensure that background Video plays on repeat
+        previewVid.setOnCompletionListener { previewVid.start() }
+        previewVid.setVideoPath("android.resource://" + requireContext().packageName + "/" +R.raw.project)
+        previewVid.start()
 
         chooseBtn.setOnClickListener {
             launchVideoChooser()
+
         }
 
         recordBtn.setOnClickListener {
             launchVideoRecorder()
         }
 
-        filterBtn.setOnClickListener {
-            if (previewVid.isVisible) {
-                val videoUri = videoInputUri.toString()
-                val bundle = bundleOf("videoUri" to videoUri)
-                binding.root.findNavController().navigate(R.id.action_inputFragment_to_filterFragment,bundle)
-            }
-            else
-                Toast.makeText(requireActivity(),"Enter a Video!",Toast.LENGTH_SHORT).show()
-        }
+
+
 
         viewModel.selectedVideoUri.observe(viewLifecycleOwner) { uri ->
             videoInputUri = uri
@@ -104,14 +99,23 @@ class InputFragment : Fragment() {
                 prepareVideoInput(videoInputUri!!)
             }
         }
+    }
+
+    private fun navigateToNext() {
+        val videoUri = videoInputUri.toString()
+        val bundle = bundleOf("videoUri" to videoUri)
+        binding.root.findNavController()
+            .navigate(R.id.action_inputFragment_to_filterFragment, bundle)
 
     }
 
     private fun launchVideoChooser() {
+        previewVid.pause()
         videoChooser.launch("video/*")
     }
 
     private fun launchVideoRecorder() {
+        previewVid.pause()
         val intent = Intent(MediaStore.ACTION_VIDEO_CAPTURE)
         videoRecorder.launch(intent)
     }

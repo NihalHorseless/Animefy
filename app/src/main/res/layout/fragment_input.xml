@@ -6,47 +6,60 @@
     android:layout_height="match_parent"
     tools:context=".InputFragment">
 
-    <Button
-        android:id="@+id/record_video_btn"
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/galleryBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:text="@string/gallery_btn"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/video_view" />
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="16dp"
+        android:clickable="true"
+        android:contentDescription="@string/fiter_name_txt"
+        android:focusable="true"
+        android:src="@android:drawable/ic_menu_gallery"
+        app:backgroundTint="@color/divider_color"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/cameraBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginBottom="16dp"
+        android:clickable="true"
+        android:contentDescription="@string/fiter_name_txt"
+        android:focusable="true"
+        android:src="@android:drawable/ic_menu_camera"
+        app:backgroundTint="@color/divider_color"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <VideoView
         android:id="@+id/video_view"
         android:layout_width="match_parent"
-        android:layout_height="300dp"
-        android:layout_margin="16dp"
+        android:layout_height="match_parent"
         android:fitsSystemWindows="true"
         android:gravity="center"
-        android:visibility="invisible"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-
-    <Button
-        android:id="@+id/animate_btn"
+    <TextView
+        android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:text="@string/animate_btn"
+        android:layout_marginTop="48dp"
+        android:fontFamily="@font/assistant_semibold"
+        android:text="PICNIC"
+        android:textAlignment="center"
+        android:textColor="#2DFBC1"
+        android:textSize="34sp"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/choose_video_btn" />
+        app:layout_constraintTop_toTopOf="@+id/video_view" />
 
-    <Button
-        android:id="@+id/choose_video_btn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="@string/choose_vid"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/record_video_btn" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

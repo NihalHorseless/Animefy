@@ -8,8 +8,9 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.setupActionBarWithNavController
 import com.example.animeyourself.databinding.ActivityMainBinding
-
 
 
 class MainActivity : AppCompatActivity() {
@@ -17,6 +18,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var navController: NavController
 
     private lateinit var binding: ActivityMainBinding
+
+    private lateinit var appBarConfiguration: AppBarConfiguration
 
     // private lateinit var bottomNavBar: BottomNavigationView
 
@@ -30,7 +33,26 @@ class MainActivity : AppCompatActivity() {
             supportFragmentManager.findFragmentById(R.id.fragment) as NavHostFragment
         navController = navHostFragment.navController
 
+        appBarConfiguration = AppBarConfiguration(navController.graph)
+        setupActionBarWithNavController(navController, appBarConfiguration)
+
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            when (destination.id) {
+                R.id.inputFragment -> {
+                    hideAppBar()
+                }
+                R.id.filterFragment -> {
+                    supportActionBar!!.title = "Filters"
+                    showAppBar()
+                }
+            }
+    }
+
         // bottomNavBar = binding.bottomNavigationView
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        return navController.navigateUp() || super.onSupportNavigateUp()
     }
 
     override fun onRequestPermissionsResult(
@@ -43,7 +65,8 @@ class MainActivity : AppCompatActivity() {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 Toast.makeText(this, "Permissions granted!", Toast.LENGTH_SHORT).show()
             } else {
-                Toast.makeText(this, "Permissions denied, please turn on permissions for the app",
+                Toast.makeText(
+                    this, "Permissions denied, please turn on permissions for the app",
                     Toast.LENGTH_LONG
                 ).show()
             }
@@ -74,6 +97,16 @@ class MainActivity : AppCompatActivity() {
         } else {
             Toast.makeText(this, "Permissions already given!", Toast.LENGTH_SHORT).show()
         }
+    }
+    private fun hideAppBar() {
+        supportActionBar?.setDisplayHomeAsUpEnabled(false)
+        supportActionBar?.setDisplayShowHomeEnabled(false)
+        supportActionBar?.hide()
+    }
+    private fun showAppBar() {
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setDisplayShowHomeEnabled(true)
+        supportActionBar?.show()
     }
 
     companion object {

@@ -13,11 +13,12 @@ import android.widget.VideoView
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.findNavController
 import com.daasuu.gpuv.composer.FillMode
 import com.daasuu.gpuv.composer.GPUMp4Composer
 import com.daasuu.gpuv.composer.Rotation
 import com.daasuu.gpuv.egl.filter.*
-import com.example.animeyourself.customfilters.GlAnimeFilter
+import com.example.animeyourself.customfilters.GlAnimeFiltertWO
 import com.example.animeyourself.customfilters.GlCandyRedFilter
 import com.example.animeyourself.customfilters.GlOrangeFilter
 import com.example.animeyourself.databinding.FragmentFilterBinding
@@ -58,7 +59,10 @@ class FilterFragment : Fragment() {
     }
 
     private fun initializeFields() {
+        // Arranging color level of the poster filter
         val posterFilter = GlPosterizeFilter()
+        posterFilter.setColorLevels(8)
+        // Binding objects
         filteredVideoView = binding.videoView
         saveBtn = binding.floatingActionButton
         filterOptions = binding.chipGroup
@@ -67,13 +71,13 @@ class FilterFragment : Fragment() {
         // Creating temp file to reference path
         val tempFile = createTempFileHere(sourceVideoUri)
         val outputFilePath = "${requireContext().cacheDir}/filtered_video.mp4"
-        posterFilter.setColorLevels(8)
+
         filterOptions.setOnCheckedStateChangeListener { _, checkedId ->
             when (checkedId[0]) {
                 R.id.chipAnime -> {
                     applyFilter(
                         GlFilterGroup(posterFilter,
-                            GlAnimeFilter()
+                            GlAnimeFiltertWO()
                         ),
                         tempFile.path,
                         outputFilePath
@@ -141,6 +145,8 @@ class FilterFragment : Fragment() {
             Toast.makeText(requireContext(), "Error saving video to gallery", Toast.LENGTH_SHORT)
                 .show()
         }
+
+        binding.root.findNavController().navigate(R.id.action_filterFragment_to_inputFragment)
 
     }
 

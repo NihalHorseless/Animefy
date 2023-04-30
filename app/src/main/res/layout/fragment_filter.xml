@@ -13,30 +13,34 @@
         android:layout_marginBottom="16dp"
         android:clickable="true"
         android:contentDescription="@string/fiter_name_txt"
+        android:focusable="true"
         android:src="@android:drawable/ic_menu_save"
+        app:backgroundTint="@color/text_icons"
         app:layout_constraintBottom_toTopOf="@+id/chipGroup"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.9"
-        app:layout_constraintStart_toStartOf="parent"
-        android:focusable="true" />
-
+        app:layout_constraintStart_toStartOf="parent" />
 
 
     <com.google.android.material.chip.ChipGroup
         android:id="@+id/chipGroup"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/primary"
         app:chipSpacing="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:singleLine="true"
         app:singleSelection="true">
+
         <com.google.android.material.chip.Chip
             android:id="@+id/chipPoster"
             style="@style/Widget.MaterialComponents.Chip.Choice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:background="@color/teal_200"
+            android:backgroundTint="@color/divider_color"
             android:text="@string/filter_poster" />
 
         <com.google.android.material.chip.Chip
@@ -44,6 +48,8 @@
             style="@style/Widget.MaterialComponents.Chip.Choice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:background="@color/teal_200"
+            android:backgroundTint="@color/divider_color"
             android:text="@string/filter_anime" />
 
         <com.google.android.material.chip.Chip
@@ -51,6 +57,8 @@
             style="@style/Widget.MaterialComponents.Chip.Choice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:background="@color/teal_200"
+            android:backgroundTint="@color/divider_color"
             android:text="@string/filter_candy" />
 
         <com.google.android.material.chip.Chip
@@ -58,24 +66,28 @@
             style="@style/Widget.MaterialComponents.Chip.Choice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:background="@color/teal_200"
+            android:backgroundTint="@color/divider_color"
             android:text="@string/filter_dune" />
+
         <com.google.android.material.chip.Chip
             android:id="@+id/chipNeon"
             style="@style/Widget.MaterialComponents.Chip.Choice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:backgroundTint="@color/divider_color"
             android:text="@string/filter_S" />
 
     </com.google.android.material.chip.ChipGroup>
 
 
-
-
     <VideoView
         android:id="@+id/videoView"
         android:layout_width="0dp"
-        android:layout_height="288dp"
+        android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
+        android:backgroundTint="@color/primary"
+        app:layout_constraintBottom_toTopOf="@+id/floatingActionButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

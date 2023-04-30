@@ -47,18 +47,12 @@ dependencies {
     implementation "androidx.navigation:navigation-ui-ktx:2.5.3"
     //GpuImage
     implementation 'jp.co.cyberagent.android:gpuimage:2.1.0'
+    //GPUVideo
     implementation 'com.github.MasayukiSuda:GPUVideo-android:v0.1.2'
     //ExoPlayer
     implementation 'com.google.android.exoplayer:exoplayer:2.18.1'
     // CameraX Dependencies
-    def camerax_version = "1.2.2"
-    implementation "androidx.camera:camera-core:${camerax_version}"
-    implementation "androidx.camera:camera-camera2:${camerax_version}"
-    implementation "androidx.camera:camera-lifecycle:${camerax_version}"
-    implementation "androidx.camera:camera-video:${camerax_version}"
 
-    implementation "androidx.camera:camera-view:${camerax_version}"
-    implementation "androidx.camera:camera-extensions:${camerax_version}"
     // Event Bus
     implementation 'org.greenrobot:eventbus:3.3.1'
 
