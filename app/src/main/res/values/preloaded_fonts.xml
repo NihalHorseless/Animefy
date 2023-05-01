@@ -3,5 +3,7 @@
     <array name="preloaded_fonts" translatable="false">
         <item>@font/assistant_semibold</item>
         <item>@font/calligraffitti</item>
+        <item>@font/hepta_slab_light</item>
+        <item>@font/homemade_apple</item>
     </array>
 </resources>

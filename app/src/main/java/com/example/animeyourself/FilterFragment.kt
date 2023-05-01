@@ -18,8 +18,9 @@ import com.daasuu.gpuv.composer.FillMode
 import com.daasuu.gpuv.composer.GPUMp4Composer
 import com.daasuu.gpuv.composer.Rotation
 import com.daasuu.gpuv.egl.filter.*
-import com.example.animeyourself.customfilters.GlAnimeFiltertWO
+import com.example.animeyourself.customfilters.GlAnimeFilter
 import com.example.animeyourself.customfilters.GlCandyRedFilter
+import com.example.animeyourself.customfilters.GlCartoonFilter
 import com.example.animeyourself.customfilters.GlOrangeFilter
 import com.example.animeyourself.databinding.FragmentFilterBinding
 import com.google.android.material.chip.ChipGroup
@@ -39,7 +40,7 @@ class FilterFragment : Fragment() {
     private lateinit var filteredVideoView: VideoView
     private lateinit var saveBtn: FloatingActionButton
     private lateinit var filterOptions: ChipGroup
-
+    private lateinit var revertBtn: FloatingActionButton
     private lateinit var sourceVideoUri: Uri
 
 
@@ -61,59 +62,73 @@ class FilterFragment : Fragment() {
     private fun initializeFields() {
         // Arranging color level of the poster filter
         val posterFilter = GlPosterizeFilter()
-        posterFilter.setColorLevels(8)
+        posterFilter.setColorLevels(7)
         // Binding objects
         filteredVideoView = binding.videoView
-        saveBtn = binding.floatingActionButton
+        filteredVideoView.setOnCompletionListener { filteredVideoView.start() }
+        saveBtn = binding.saveBtn
+        revertBtn = binding.revertBtn
+
         filterOptions = binding.chipGroup
         // Get the URI of the video from the arguments
         sourceVideoUri = arguments?.getString("videoUri")!!.toUri()
+        filteredVideoView.setVideoURI(sourceVideoUri)
+        filteredVideoView.start()
         // Creating temp file to reference path
         val tempFile = createTempFileHere(sourceVideoUri)
         val outputFilePath = "${requireContext().cacheDir}/filtered_video.mp4"
 
         filterOptions.setOnCheckedStateChangeListener { _, checkedId ->
-            when (checkedId[0]) {
-                R.id.chipAnime -> {
-                    applyFilter(
-                        GlFilterGroup(posterFilter,
-                            GlAnimeFiltertWO()
-                        ),
-                        tempFile.path,
-                        outputFilePath
-                    )
-                }
-                R.id.chipCandy -> {
-                    applyFilter(
-                        GlCandyRedFilter(),
-                        tempFile.path,
-                        outputFilePath
-                    )
-                }
-                R.id.chipSepia -> {
-                    applyFilter(
-                        GlOrangeFilter(),
-                        tempFile.path, outputFilePath
-                    )
-                }
-                R.id.chipPoster -> {
-                    applyFilter(
-                        posterFilter,
-                        tempFile.path, outputFilePath
-                    )
-                }
-                R.id.chipNeon -> {
-                    applyFilter(
-                        GlFilterGroup(GlMonochromeFilter(), GlVignetteFilter()),
-                        tempFile.path,
-                        outputFilePath
-                    )
+            if (checkedId.size > 0) {
+                when (checkedId[0]) {
+                    R.id.chipAnime -> {
+                        applyFilter(
+                            GlFilterGroup(
+                                GlCartoonFilter(),
+                                GlAnimeFilter(),
+                                GlHighlightShadowFilter()
+                            ),
+                            tempFile.path,
+                            outputFilePath
+                        )
+                    }
+                    R.id.chipCandy -> {
+                        applyFilter(
+                            GlCandyRedFilter(),
+                            tempFile.path,
+                            outputFilePath
+                        )
+                    }
+                    R.id.chipSepia -> {
+                        applyFilter(
+                            GlFilterGroup(GlCartoonFilter(), GlAnimeFilter(), GlOrangeFilter()),
+                            tempFile.path, outputFilePath
+                        )
+                    }
+                    R.id.chipPoster -> {
+                        applyFilter(
+                            posterFilter,
+                            tempFile.path, outputFilePath
+                        )
+                    }
+                    R.id.chipNeon -> {
+                        applyFilter(
+                            GlFilterGroup(GlMonochromeFilter(), GlVignetteFilter()),
+                            tempFile.path,
+                            outputFilePath
+                        )
+                    }
+
                 }
             }
         }
 
         saveBtn.setOnClickListener {
             saveVideoToGallery()
+        }
+        revertBtn.setOnClickListener {
+            filteredVideoView.setVideoURI(sourceVideoUri)
+            filteredVideoView.start()
         }
 
     }
@@ -149,6 +164,7 @@ class FilterFragment : Fragment() {
         binding.root.findNavController().navigate(R.id.action_filterFragment_to_inputFragment)
 
     }
+
 
     private fun createTempFileHere(uri: Uri): File {
         val contentResolver = requireContext().contentResolver

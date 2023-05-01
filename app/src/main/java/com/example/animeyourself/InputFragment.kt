@@ -47,9 +47,10 @@ class InputFragment : Fragment() {
             if (result.resultCode == Activity.RESULT_OK) {
                 result.data?.data?.let { uri ->
                     videoInputUri = uri
-                    viewModel.selectVideoUri(uri)
+                    prepareVideoInput(uri)
+                    navigateToNext()
                 }
-                navigateToNext()
+
             }
         }
 
