@@ -42,7 +42,8 @@ class MainActivity : AppCompatActivity() {
                     hideAppBar()
                 }
                 R.id.filterFragment -> {
-                    supportActionBar!!.title = "Filters"
+                    // SIKINTILI
+                    supportActionBar?.title = "Filters"
                     showAppBar()
                 }
             }

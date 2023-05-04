@@ -104,9 +104,8 @@ class InputFragment : Fragment() {
 
     private fun navigateToNext() {
         val videoUri = videoInputUri.toString()
-        val bundle = bundleOf("videoUri" to videoUri)
-        binding.root.findNavController()
-            .navigate(R.id.action_inputFragment_to_filterFragment, bundle)
+        val action = InputFragmentDirections.actionInputFragmentToFilterFragment(videoUri)
+        binding.root.findNavController().navigate(action)
 
     }
 

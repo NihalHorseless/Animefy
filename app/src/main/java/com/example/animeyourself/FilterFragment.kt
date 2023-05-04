@@ -9,7 +9,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import android.widget.VideoView
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -18,13 +17,10 @@ import com.daasuu.gpuv.composer.FillMode
 import com.daasuu.gpuv.composer.GPUMp4Composer
 import com.daasuu.gpuv.composer.Rotation
 import com.daasuu.gpuv.egl.filter.*
-import com.example.animeyourself.customfilters.GlAnimeFilter
 import com.example.animeyourself.customfilters.GlCandyRedFilter
-import com.example.animeyourself.customfilters.GlCartoonFilter
 import com.example.animeyourself.customfilters.GlOrangeFilter
+import com.example.animeyourself.customfilters.GlSmoothDefineEdge
 import com.example.animeyourself.databinding.FragmentFilterBinding
-import com.google.android.material.chip.ChipGroup
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.launch
 import java.io.File
 import java.io.IOException
@@ -37,10 +33,18 @@ class FilterFragment : Fragment() {
     private val TAG = "FilterFragment"
 
     //Fields
-    private lateinit var filteredVideoView: VideoView
-    private lateinit var saveBtn: FloatingActionButton
-    private lateinit var filterOptions: ChipGroup
-    private lateinit var revertBtn: FloatingActionButton
+    private val posterFilter = GlPosterizeFilter().apply { setColorLevels(7) }
+    private val animeFilter =
+        GlFilterGroup(GlSmoothDefineEdge(), GlHighlightShadowFilter(), posterFilter)
+    private val mangaFilter = GlFilterGroup(
+        GlSmoothDefineEdge(),
+        GlHighlightShadowFilter(),
+        posterFilter,
+        GlGrayScaleFilter()
+    )
+
+    private val filteredVideoView by lazy { binding.videoView.apply { setOnCompletionListener { start() } } }
+
     private lateinit var sourceVideoUri: Uri
 
 
@@ -60,18 +64,12 @@ class FilterFragment : Fragment() {
     }
 
     private fun initializeFields() {
-        // Arranging color level of the poster filter
-        val posterFilter = GlPosterizeFilter()
-        posterFilter.setColorLevels(7)
-        // Binding objects
-        filteredVideoView = binding.videoView
-        filteredVideoView.setOnCompletionListener { filteredVideoView.start() }
-        saveBtn = binding.saveBtn
-        revertBtn = binding.revertBtn
-
-        filterOptions = binding.chipGroup
+        val saveButton = binding.saveBtn
+        val filterOptions = binding.chipGroup
+        val revertButton = binding.revertBtn
         // Get the URI of the video from the arguments
-        sourceVideoUri = arguments?.getString("videoUri")!!.toUri()
+        val args = FilterFragmentArgs.fromBundle(requireArguments())
+        sourceVideoUri = args.videoUri.toUri()
         filteredVideoView.setVideoURI(sourceVideoUri)
         filteredVideoView.start()
         // Creating temp file to reference path
@@ -79,54 +77,25 @@ class FilterFragment : Fragment() {
         val outputFilePath = "${requireContext().cacheDir}/filtered_video.mp4"
 
         filterOptions.setOnCheckedStateChangeListener { _, checkedId ->
+            // This ensures that filters work only when selected otherwise it gives out of Index Error
             if (checkedId.size > 0) {
-                when (checkedId[0]) {
-                    R.id.chipAnime -> {
-                        applyFilter(
-                            GlFilterGroup(
-                                GlCartoonFilter(),
-                                GlAnimeFilter(),
-                                GlHighlightShadowFilter()
-                            ),
-                            tempFile.path,
-                            outputFilePath
-                        )
-                    }
-                    R.id.chipCandy -> {
-                        applyFilter(
-                            GlCandyRedFilter(),
-                            tempFile.path,
-                            outputFilePath
-                        )
-                    }
-                    R.id.chipSepia -> {
-                        applyFilter(
-                            GlFilterGroup(GlCartoonFilter(), GlAnimeFilter(), GlOrangeFilter()),
-                            tempFile.path, outputFilePath
-                        )
-                    }
-                    R.id.chipPoster -> {
-                        applyFilter(
-                            posterFilter,
-                            tempFile.path, outputFilePath
-                        )
-                    }
-                    R.id.chipNeon -> {
-                        applyFilter(
-                            GlFilterGroup(GlMonochromeFilter(), GlVignetteFilter()),
-                            tempFile.path,
-                            outputFilePath
-                        )
-                    }
-
+                val filter = when (checkedId[0]) {
+                    R.id.chipAnime -> animeFilter
+                    R.id.chipCandy -> GlCandyRedFilter()
+                    R.id.chipSepia -> GlFilterGroup(GlSmoothDefineEdge(), GlOrangeFilter())
+                    R.id.chipPoster -> posterFilter
+                    R.id.chipManga -> mangaFilter
+                    else -> null
                 }
+
+                filter?.let { applyFilter(it, tempFile.path, outputFilePath) }
             }
         }
 
-        saveBtn.setOnClickListener {
+        saveButton.setOnClickListener {
             saveVideoToGallery()
         }
-        revertBtn.setOnClickListener {
+        revertButton.setOnClickListener {
             filteredVideoView.setVideoURI(sourceVideoUri)
             filteredVideoView.start()
         }
@@ -160,13 +129,13 @@ class FilterFragment : Fragment() {
             Toast.makeText(requireContext(), "Error saving video to gallery", Toast.LENGTH_SHORT)
                 .show()
         }
-
         binding.root.findNavController().navigate(R.id.action_filterFragment_to_inputFragment)
 
     }
 
 
     private fun createTempFileHere(uri: Uri): File {
+        // Add Error handling!
         val contentResolver = requireContext().contentResolver
         val inputStream = contentResolver.openInputStream(uri)
         val tempFile = File.createTempFile("temp", ".mp4", requireContext().cacheDir)
@@ -199,7 +168,7 @@ class FilterFragment : Fragment() {
 
                             Toast.makeText(
                                 context,
-                                "codec complete path =$outputFilePath",
+                                "Filter Done!",
                                 Toast.LENGTH_SHORT
                             ).show()
                         }

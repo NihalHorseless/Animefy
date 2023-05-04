@@ -12,7 +12,8 @@
     <string name="filter_comics">Gray</string>
     <string name="filter_dune">Dune</string>
     <string name="filter_poster">Poster</string>
-    <string name="filter_S">Neon</string>
+    <string name="filter_S">Manga</string>
     <string name="filter_candy">Candy</string>
     <string name="filter_new">Test</string>
+    <string name="app_title">FILTER REALITY</string>
 </resources>
