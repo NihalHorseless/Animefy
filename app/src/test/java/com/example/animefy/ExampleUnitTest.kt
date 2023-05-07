@@ -1,4 +1,4 @@
-package com.example.animeyourself
+package com.example.animefy
 
 import org.junit.Test
 

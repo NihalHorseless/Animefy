@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/inputFragment"
-        android:name="com.example.animeyourself.InputFragment"
+        android:name="com.example.animefy.InputFragment"
         android:label="fragment_input"
         tools:layout="@layout/fragment_input">
         <action
@@ -25,7 +25,7 @@
     </fragment>
     <fragment
         android:id="@+id/filterFragment"
-        android:name="com.example.animeyourself.FilterFragment"
+        android:name="com.example.animefy.FilterFragment"
         android:label="fragment_filter"
         tools:layout="@layout/fragment_filter">
         <action

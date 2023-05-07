@@ -1,4 +1,4 @@
-package com.example.animeyourself
+package com.example.animefy
 
 import android.app.Activity
 import android.content.Intent
@@ -11,10 +11,10 @@ import android.view.ViewGroup
 import android.widget.VideoView
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
+import com.example.animeyourself.R
 import com.example.animeyourself.databinding.FragmentInputBinding
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
@@ -54,7 +54,6 @@ class InputFragment : Fragment() {
             }
         }
 
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -70,6 +69,11 @@ class InputFragment : Fragment() {
 
     }
 
+    override fun onResume() {
+        super.onResume()
+        previewVid.start()
+    }
+
     private fun initializeFields() {
         viewModel = ViewModelProvider(this)[InputViewModel::class.java]
 
@@ -79,7 +83,7 @@ class InputFragment : Fragment() {
         previewVid = binding.videoView
         // To ensure that background Video plays on repeat
         previewVid.setOnCompletionListener { previewVid.start() }
-        previewVid.setVideoPath("android.resource://" + requireContext().packageName + "/" +R.raw.project)
+        previewVid.setVideoPath("android.resource://" + requireContext().packageName + "/" + R.raw.project)
         previewVid.start()
 
         chooseBtn.setOnClickListener {

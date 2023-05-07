@@ -1,4 +1,4 @@
-package com.example.animeyourself.customfilters
+package com.example.animefy.customfilters
 
 import com.daasuu.gpuv.egl.filter.GlFilter
 

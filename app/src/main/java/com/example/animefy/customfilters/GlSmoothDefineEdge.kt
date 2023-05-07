@@ -1,4 +1,4 @@
-package com.example.animeyourself.customfilters
+package com.example.animefy.customfilters
 
 import android.opengl.GLES20
 import com.daasuu.gpuv.egl.filter.GlFilter

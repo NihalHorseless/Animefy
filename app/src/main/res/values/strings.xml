@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">AnimeYourself</string>
+    <string name="app_name">Animefy</string>
     <string name="gallery_btn">Record a Video</string>
     <string name="animate_btn">Apply the Filter!</string>
     <string name="choose_vid">Choose From Gallery</string>
@@ -15,5 +15,5 @@
     <string name="filter_S">Manga</string>
     <string name="filter_candy">Candy</string>
     <string name="filter_new">Test</string>
-    <string name="app_title">FILTER REALITY</string>
+    <string name="app_title">Animefy</string>
 </resources>

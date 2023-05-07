@@ -14,7 +14,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.example.animeyourself"
+        applicationId 'com.example.animefy'
         minSdk 24
         targetSdk 33
         versionCode 1

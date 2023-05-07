@@ -1,4 +1,4 @@
-package com.example.animeyourself
+package com.example.animefy
 
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -10,6 +10,7 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
+import com.example.animeyourself.R
 import com.example.animeyourself.databinding.ActivityMainBinding
 
 
@@ -20,8 +21,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
 
     private lateinit var appBarConfiguration: AppBarConfiguration
-
-    // private lateinit var bottomNavBar: BottomNavigationView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,11 +42,12 @@ class MainActivity : AppCompatActivity() {
                 }
                 R.id.filterFragment -> {
                     // SIKINTILI
-                    supportActionBar?.title = "Filters"
                     showAppBar()
+                    supportActionBar?.title = "Filters"
+
                 }
             }
-    }
+        }
 
         // bottomNavBar = binding.bottomNavigationView
     }
@@ -99,11 +99,13 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this, "Permissions already given!", Toast.LENGTH_SHORT).show()
         }
     }
+
     private fun hideAppBar() {
         supportActionBar?.setDisplayHomeAsUpEnabled(false)
         supportActionBar?.setDisplayShowHomeEnabled(false)
         supportActionBar?.hide()
     }
+
     private fun showAppBar() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)

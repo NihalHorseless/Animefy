@@ -1,4 +1,4 @@
-package com.example.animeyourself
+package com.example.animefy
 
 import android.content.ContentValues
 import android.net.Uri
@@ -17,9 +17,10 @@ import com.daasuu.gpuv.composer.FillMode
 import com.daasuu.gpuv.composer.GPUMp4Composer
 import com.daasuu.gpuv.composer.Rotation
 import com.daasuu.gpuv.egl.filter.*
-import com.example.animeyourself.customfilters.GlCandyRedFilter
-import com.example.animeyourself.customfilters.GlOrangeFilter
-import com.example.animeyourself.customfilters.GlSmoothDefineEdge
+import com.example.animefy.customfilters.GlCandyRedFilter
+import com.example.animefy.customfilters.GlOrangeFilter
+import com.example.animefy.customfilters.GlSmoothDefineEdge
+import com.example.animeyourself.R
 import com.example.animeyourself.databinding.FragmentFilterBinding
 import kotlinx.coroutines.launch
 import java.io.File
@@ -61,6 +62,11 @@ class FilterFragment : Fragment() {
         initializeFields()
 
 
+    }
+
+    override fun onResume() {
+        super.onResume()
+        requireActivity().setTitle("Filters")
     }
 
     private fun initializeFields() {

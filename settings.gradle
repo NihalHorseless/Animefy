@@ -13,5 +13,5 @@ dependencyResolutionManagement {
         maven { url 'https://www.jitpack.io' }
     }
 }
-rootProject.name = "AnimeYourself"
+rootProject.name = "animefy"
 include ':app'

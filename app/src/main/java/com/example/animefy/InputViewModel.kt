@@ -1,4 +1,4 @@
-package com.example.animeyourself
+package com.example.animefy
 
 import android.net.Uri
 import androidx.lifecycle.LiveData
