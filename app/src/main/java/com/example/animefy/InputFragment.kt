@@ -16,7 +16,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import com.example.animeyourself.R
 import com.example.animeyourself.databinding.FragmentInputBinding
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 
 class InputFragment : Fragment() {
@@ -25,8 +24,6 @@ class InputFragment : Fragment() {
     private lateinit var binding: FragmentInputBinding
 
     //Fields
-    private lateinit var recordBtn: FloatingActionButton
-    private lateinit var chooseBtn: FloatingActionButton
     private lateinit var previewVid: VideoView
 
     private lateinit var viewModel: InputViewModel
@@ -37,7 +34,7 @@ class InputFragment : Fragment() {
         registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
             uri?.let {
                 videoInputUri = it
-                prepareVideoInput(it)
+                viewModel.prepareVideoInput(it, previewVid)
                 navigateToNext()
             }
         }
@@ -47,7 +44,7 @@ class InputFragment : Fragment() {
             if (result.resultCode == Activity.RESULT_OK) {
                 result.data?.data?.let { uri ->
                     videoInputUri = uri
-                    prepareVideoInput(uri)
+                    viewModel.prepareVideoInput(uri, previewVid)
                     navigateToNext()
                 }
 
@@ -59,7 +56,6 @@ class InputFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentInputBinding.inflate(inflater, container, false)
-
         return binding.root
     }
 
@@ -77,33 +73,32 @@ class InputFragment : Fragment() {
     private fun initializeFields() {
         viewModel = ViewModelProvider(this)[InputViewModel::class.java]
 
-        chooseBtn = binding.galleryBtn
-        recordBtn = binding.cameraBtn
+        val chooseBtn = binding.galleryBtn
+        val recordBtn = binding.cameraBtn
 
         previewVid = binding.videoView
         // To ensure that background Video plays on repeat
-        previewVid.setOnCompletionListener { previewVid.start() }
-        previewVid.setVideoPath("android.resource://" + requireContext().packageName + "/" + R.raw.project)
-        previewVid.start()
+        playBackgroundVid()
 
         chooseBtn.setOnClickListener {
             launchVideoChooser()
-
         }
 
         recordBtn.setOnClickListener {
             launchVideoRecorder()
         }
-
-
-
-
         viewModel.selectedVideoUri.observe(viewLifecycleOwner) { uri ->
             videoInputUri = uri
             if (videoInputUri != null) {
-                prepareVideoInput(videoInputUri!!)
+                viewModel.prepareVideoInput(videoInputUri!!, previewVid)
             }
         }
+    }
+
+    private fun playBackgroundVid() {
+        previewVid.setOnCompletionListener { previewVid.start() }
+        previewVid.setVideoPath("android.resource://" + requireContext().packageName + "/" + R.raw.project)
+        previewVid.start()
     }
 
     private fun navigateToNext() {
@@ -125,8 +120,4 @@ class InputFragment : Fragment() {
     }
 
 
-    private fun prepareVideoInput(videoUri: Uri) {
-        previewVid.setVideoURI(videoUri)
-        previewVid.start()
-    }
 }
