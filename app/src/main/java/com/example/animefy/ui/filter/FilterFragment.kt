@@ -1,4 +1,4 @@
-package com.example.animefy
+package com.example.animefy.ui.filter
 
 import android.net.Uri
 import android.os.Bundle
@@ -16,24 +16,21 @@ import androidx.navigation.findNavController
 import com.daasuu.gpuv.composer.FillMode
 import com.daasuu.gpuv.composer.GPUMp4Composer
 import com.daasuu.gpuv.composer.Rotation
-import com.daasuu.gpuv.egl.filter.*
-import com.example.animefy.customfilters.GlCandyRedFilter
-import com.example.animefy.customfilters.GlOrangeFilter
-import com.example.animefy.customfilters.GlSmoothDefineEdge
+import com.daasuu.gpuv.egl.filter.GlFilter
+import com.example.animefy.FilterFragmentArgs
 import com.example.animeyourself.R
 import com.example.animeyourself.databinding.FragmentFilterBinding
-import com.google.android.material.chip.ChipGroup
 import kotlinx.coroutines.launch
-
 
 
 class FilterFragment : Fragment() {
 
-    private lateinit var binding: FragmentFilterBinding
-
     private val TAG = "FilterFragment"
 
-    //Fields
+    // I defined a boolean variable called canApplyFilter so it won't try to apply multiple filters at the same time
+    private var canApplyFilter = false
+
+    private lateinit var binding: FragmentFilterBinding
 
     private lateinit var viewModel: FilterViewModel
 
@@ -46,7 +43,6 @@ class FilterFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        viewModel = ViewModelProvider(this)[FilterViewModel::class.java]
         binding = FragmentFilterBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -62,14 +58,24 @@ class FilterFragment : Fragment() {
         val saveButton = binding.saveBtn
         val filterOptions = binding.chipGroup
         val revertButton = binding.revertBtn
+
+        viewModel = ViewModelProvider(this)[FilterViewModel::class.java]
+
         filteredVideoView = binding.videoView.apply { setOnCompletionListener { start() } }
-        // Get the URI of the video from the arguments
+
+        // Get the URI of the video from the other Fragment
         val args = FilterFragmentArgs.fromBundle(requireArguments())
         sourceVideoUri = args.videoUri.toUri()
         filteredVideoView.setVideoURI(sourceVideoUri)
         filteredVideoView.start()
-        // Creating temp file to reference path
-        setupFilterOptions(filterOptions)
+
+        // Observe the User selected filter and then create a temp file for reference
+        viewModel.observeSelectedFilter(filterOptions).observe(viewLifecycleOwner) { filter ->
+            val tempFile = viewModel.createTempFileHere(sourceVideoUri)
+            val outputFilePath = "${requireContext().cacheDir}/$FILTERED_VIDEO_FILENAME"
+
+            filter?.let { applyFilter(it, tempFile.path, outputFilePath) }
+        }
 
         saveButton.setOnClickListener {
             saveVideoToGallery()
@@ -77,28 +83,6 @@ class FilterFragment : Fragment() {
         revertButton.setOnClickListener {
             filteredVideoView.setVideoURI(sourceVideoUri)
             filteredVideoView.start()
-        }
-
-    }
-
-    private fun setupFilterOptions(filterOptions: ChipGroup) {
-        val tempFile = viewModel.createTempFileHere(sourceVideoUri)
-        val outputFilePath = "${requireContext().cacheDir}/filtered_video.mp4"
-
-        filterOptions.setOnCheckedStateChangeListener { _, checkedId ->
-            // This ensures that filters work only when selected otherwise it gives out of Index Error
-            if (checkedId.size > 0) {
-                val filter = when (checkedId[0]) {
-                    R.id.chipAnime -> viewModel.animeFilter
-                    R.id.chipCandy -> GlCandyRedFilter()
-                    R.id.chipSepia -> GlFilterGroup(GlSmoothDefineEdge(), GlOrangeFilter())
-                    R.id.chipPoster -> viewModel.posterFilter
-                    R.id.chipManga -> viewModel.mangaFilter
-                    else -> null
-                }
-
-                filter?.let { applyFilter(it, tempFile.path, outputFilePath) }
-            }
         }
 
     }
@@ -116,23 +100,16 @@ class FilterFragment : Fragment() {
     }
 
 
-    // private fun createTempFileHere(uri: Uri): File {
-    //     // Add Error handling!
-    //     val contentResolver = requireContext().contentResolver
-    //     val inputStream = contentResolver.openInputStream(uri)
-    //     val tempFile = File.createTempFile("temp", ".mp4", requireContext().cacheDir)
-    //     tempFile.outputStream().use { outputStream ->
-    //         inputStream?.copyTo(outputStream)
-    //     }
-    //     inputStream?.close()
-    //     return tempFile
-    // }
-
     private fun applyFilter(
         appliedFilter: GlFilter,
         filePath: String,
-        outputFilePath: String
+        outputFilePath: String,
     ) {
+        filteredVideoView.stopPlayback()
+        if (canApplyFilter) {
+            return
+        }
+        canApplyFilter = true
         lifecycleScope.launch {
             GPUMp4Composer(filePath, outputFilePath)
                 .rotation(Rotation.NORMAL)
@@ -155,21 +132,25 @@ class FilterFragment : Fragment() {
                                 Toast.LENGTH_SHORT
                             ).show()
                         }
-
-
+                        canApplyFilter = false
                     }
 
                     override fun onCanceled() {
                         Log.d(TAG, "onCanceled")
+                        canApplyFilter = false
                     }
 
                     override fun onFailed(exception: Exception?) {
                         Log.e(TAG, "onFailed()", exception)
+                        canApplyFilter = false
                     }
                 })
                 .start()
 
         }
+    }
+    companion object {
+        const val FILTERED_VIDEO_FILENAME = "filtered_video.mp4"
     }
 
 }

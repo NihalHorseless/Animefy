@@ -1,4 +1,4 @@
-package com.example.animefy
+package com.example.animefy.ui.input
 
 import android.app.Activity
 import android.content.Intent
@@ -14,8 +14,10 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
+import com.example.animefy.InputFragmentDirections
 import com.example.animeyourself.R
 import com.example.animeyourself.databinding.FragmentInputBinding
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 
 class InputFragment : Fragment() {
@@ -25,6 +27,9 @@ class InputFragment : Fragment() {
 
     //Fields
     private lateinit var previewVid: VideoView
+    // Declare as member variable
+    private lateinit var chooseBtn: FloatingActionButton
+    private lateinit var recordBtn: FloatingActionButton
 
     private lateinit var viewModel: InputViewModel
 
@@ -56,6 +61,11 @@ class InputFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentInputBinding.inflate(inflater, container, false)
+
+        chooseBtn = binding.galleryBtn
+        recordBtn = binding.cameraBtn
+        previewVid = binding.videoView
+
         return binding.root
     }
 
@@ -73,10 +83,6 @@ class InputFragment : Fragment() {
     private fun initializeFields() {
         viewModel = ViewModelProvider(this)[InputViewModel::class.java]
 
-        val chooseBtn = binding.galleryBtn
-        val recordBtn = binding.cameraBtn
-
-        previewVid = binding.videoView
         // To ensure that background Video plays on repeat
         playBackgroundVid()
 

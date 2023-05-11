@@ -1,4 +1,4 @@
-package com.example.animefy
+package com.example.animefy.ui.filter
 
 import android.app.Application
 import android.content.ContentResolver
@@ -7,32 +7,57 @@ import android.net.Uri
 import android.provider.MediaStore
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
-import com.daasuu.gpuv.egl.filter.GlFilterGroup
-import com.daasuu.gpuv.egl.filter.GlGrayScaleFilter
-import com.daasuu.gpuv.egl.filter.GlHighlightShadowFilter
-import com.daasuu.gpuv.egl.filter.GlPosterizeFilter
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import com.daasuu.gpuv.egl.filter.*
+import com.example.animefy.customfilters.GlCandyRedFilter
+import com.example.animefy.customfilters.GlOrangeFilter
 import com.example.animefy.customfilters.GlSmoothDefineEdge
+import com.example.animeyourself.R
+import com.google.android.material.chip.ChipGroup
 import java.io.File
 import java.io.IOException
 
-class FilterViewModel(application: Application): AndroidViewModel(application) {
+class FilterViewModel(application: Application) : AndroidViewModel(application) {
     private val TAG = "FilterViewModel"
 
     //Fields
     private val _posterFilter = GlPosterizeFilter().apply { setColorLevels(7) }
-    val posterFilter: GlPosterizeFilter
+    private val posterFilter: GlPosterizeFilter
         get() = _posterFilter
 
-    private val _animeFilter = GlFilterGroup(GlSmoothDefineEdge(), GlHighlightShadowFilter(), posterFilter)
-    val animeFilter: GlFilterGroup
+    private val _animeFilter =
+        GlFilterGroup(GlSmoothDefineEdge(), GlHighlightShadowFilter(), posterFilter)
+    private val animeFilter: GlFilterGroup
         get() = _animeFilter
 
-    private val _mangaFilter = GlFilterGroup(GlSmoothDefineEdge(), GlHighlightShadowFilter(),
+    private val _mangaFilter = GlFilterGroup(
+        GlSmoothDefineEdge(), GlHighlightShadowFilter(),
         posterFilter, GlGrayScaleFilter()
     )
-    val mangaFilter: GlFilterGroup
+    private val mangaFilter: GlFilterGroup
         get() = _mangaFilter
 
+    fun observeSelectedFilter(filterOptions: ChipGroup): LiveData<GlFilter?> {
+        val selectedFilter = MutableLiveData<GlFilter?>()
+        filterOptions.setOnCheckedStateChangeListener { _, checkedId ->
+            // This ensures that filters work only when selected otherwise it gives out of Index Error
+            if (checkedId.size > 0) {
+                val filter = when (checkedId[0]) {
+                    R.id.chipAnime -> animeFilter
+                    R.id.chipCandy -> GlCandyRedFilter()
+                    R.id.chipSepia -> GlFilterGroup(GlSmoothDefineEdge(), GlOrangeFilter())
+                    R.id.chipPoster -> posterFilter
+                    R.id.chipManga -> mangaFilter
+                    else -> null
+                }
+
+                selectedFilter.value = filter
+            }
+        }
+
+        return selectedFilter
+    }
 
     fun createTempFileHere(uri: Uri): File {
         val contentResolver = getApplication<Application>().contentResolver
@@ -44,6 +69,7 @@ class FilterViewModel(application: Application): AndroidViewModel(application) {
         inputStream?.close()
         return tempFile
     }
+
     fun saveVideoToGallery(contentResolver: ContentResolver, cacheDir: File): Boolean {
         val values = ContentValues().apply {
             put(MediaStore.Video.Media.DISPLAY_NAME, "filtered_video.mp4")

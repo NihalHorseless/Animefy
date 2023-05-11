@@ -1,4 +1,4 @@
-package com.example.animefy
+package com.example.animefy.ui.input
 
 import android.net.Uri
 import android.widget.VideoView

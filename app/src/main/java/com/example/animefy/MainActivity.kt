@@ -41,15 +41,14 @@ class MainActivity : AppCompatActivity() {
                     hideAppBar()
                 }
                 R.id.filterFragment -> {
-                    // SIKINTILI
                     showAppBar()
-                    supportActionBar?.title = "Filters"
+                    supportActionBar?.apply {
+                        title = "Filters"
+                    }
 
                 }
             }
         }
-
-        // bottomNavBar = binding.bottomNavigationView
     }
 
     override fun onSupportNavigateUp(): Boolean {
