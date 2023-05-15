@@ -16,4 +16,8 @@
     <string name="filter_candy">Candy</string>
     <string name="filter_new">Test</string>
     <string name="app_title">Animefy</string>
+    <string name="galleryBtnDescription">Allows users to pick video from their gallery</string>
+    <string name="cameraBtnDescription">Allows users to record video</string>
+    <string name="revertBtnDescription">Plays the original inputted video</string>
+    <string name="saveBtnDescription">Saves the video to Gallery</string>
 </resources>

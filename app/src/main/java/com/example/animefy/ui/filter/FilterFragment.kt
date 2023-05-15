@@ -73,7 +73,6 @@ class FilterFragment : Fragment() {
         viewModel.observeSelectedFilter(filterOptions).observe(viewLifecycleOwner) { filter ->
             val tempFile = viewModel.createTempFileHere(sourceVideoUri)
             val outputFilePath = "${requireContext().cacheDir}/$FILTERED_VIDEO_FILENAME"
-
             filter?.let { applyFilter(it, tempFile.path, outputFilePath) }
         }
 
